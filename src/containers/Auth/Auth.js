@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import classes from './Auth.module.css'
 import Button from '../../components/UI/Button'
 import Input from '../../components/UI/Input'
-
+import is from 'is_js'
 export default class Auth extends Component {
   state = {
     formControls: {
@@ -41,8 +41,35 @@ export default class Auth extends Component {
   submitHandler = event => {
     event.preventDefault()
   }
+  validateControl = (value, validation) => {
+    if(!validation) {
+      return true
+    }
+    let isValid = true
+    if(validation.required) {
+      isValid = value.trim() !== '' && isValid
+    }
+    if(validation.email) {
+      isValid = is.email(value) && isValid
+    }
+    if(validation.minLength) {
+      isValid = value.length >= validation.minLength && isValid
+    }
+    return isValid
+  }
   onChangeHandler = (event, controlName) => {
-    console.log(`${controlName}: `, event.target.value)
+    const formControls = {...this.state.formControls}
+    const control = {...formControls[controlName]}
+
+    control.value = event.target.value
+    control.touched = true
+    control.valid = this.validateControl(control.value, control.validation)
+
+    formControls[controlName] = control
+
+    this.setState({
+      formControls
+    })
   }
   renderInputs = () => {
     return Object.keys(this.state.formControls).map((controlName, index) => {
@@ -69,12 +96,6 @@ export default class Auth extends Component {
           <h1>Авторизация</h1>
           <form onSubmit={this.submitHandler} className={classes.AuthForm}>
             { this.renderInputs() }
-            <Input 
-              label="Email" 
-            />
-            <Input 
-              label="Пароль"
-            />
             <Button 
               type="success" 
               onClick={this.loginHandler}
