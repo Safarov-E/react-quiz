@@ -39,6 +39,9 @@ export function logout() {
         type: AUTH_LOGOUT
     }
 }
+export function authLogin() {
+    
+}
 export function authSuccess(token) {
     return {
         type: AUTH_SUCCESS,
